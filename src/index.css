@@ -1,0 +1,163 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.lds-ripple {
+  display: inline-block;
+  position: relative;
+  width: 80px;
+  height: 80px;
+}
+.lds-ripple div {
+  position: absolute;
+  border: 4px solid #0e7e15;
+  opacity: 1;
+  border-radius: 50%;
+  animation: lds-ripple 1s cubic-bezier(0, 0.2, 0.8, 1) infinite;
+}
+.lds-ripple div:nth-child(2) {
+  animation-delay: -0.5s;
+}
+@keyframes lds-ripple {
+  0% {
+    top: 36px;
+    left: 36px;
+    width: 0;
+    height: 0;
+    opacity: 0;
+  }
+  4.9% {
+    top: 36px;
+    left: 36px;
+    width: 0;
+    height: 0;
+    opacity: 0;
+  }
+  5% {
+    top: 36px;
+    left: 36px;
+    width: 0;
+    height: 0;
+    opacity: 1;
+  }
+  100% {
+    top: 0px;
+    left: 0px;
+    width: 72px;
+    height: 72px;
+    opacity: 0;
+  }
+}
+.test {
+  padding: 20px;
+}
+
+.custom-general-button:hover {
+  background-color: #0e7e15 !important;
+  color: #fff !important;
+}
+
+@media (max-width: 640px) {
+  .data_table {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .data_table table {
+    display: block;
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+
+  .data_table thead {
+    display: none;
+  }
+
+  .data_table tbody,
+  .data_table tr {
+    display: block;
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+
+  .data_table td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  }
+
+  .data_table td::before {
+    content: attr(data-label);
+    font-weight: bold;
+    color: #333;
+    flex: 0 0 40%;
+    text-align: left;
+    margin-right: 1rem;
+    white-space: normal;
+  }
+
+  .data_table tr {
+    border-bottom: 1px solid #eee;
+  }
+
+  .data_table td:last-child {
+    margin-bottom: 0;
+  }
+
+  .data_table {
+    word-wrap: break-word;
+    word-break: break-word;
+  }
+
+  .data_table tbody > tr {
+    margin-bottom: 1rem;
+  }
+}
+
+.c-column:hover {
+  background-color: none !important;
+}
+
+/* Paginator.css */
+.custom-pagination .ant-pagination-item.ant-pagination-item-active {
+  border-color: #0e7e15 !important; /* Set border color */
+  color: #0e7e15 !important; /* Set text color */
+}
+
+.custom-pagination .ant-pagination-item-active a {
+  color: #0e7e15 !important; /* Ensure the active item text is colored correctly */
+}
+
+/* Paginator.css */
+.custom-pagination .ant-pagination-item.ant-pagination-item-active {
+  border-color: #0e7e15 !important; /* Set border color */
+  color: #0e7e15 !important; /* Set text color */
+}
+
+.custom-pagination .ant-pagination-item-active a {
+  color: #0e7e15 !important; /* Ensure the active item text is colored correctly */
+}
+
+/* Add hover effect without changing background */
+.custom-pagination .ant-pagination-item:hover {
+  border-color: #0e7e15 !important; /* Set border color on hover */
+  color: #0e7e15 !important; /* Set text color on hover */
+  background-color: transparent !important; /* Prevent background color change */
+}
+
+.custom-pagination .ant-pagination-item:hover a {
+  color: #0e7e15 !important; /* Ensure the text color changes on hover */
+}
