@@ -1,9 +1,8 @@
 import { FC, ReactElement, cloneElement } from 'react'
 import { BsCalendar3Week } from 'react-icons/bs'
-import { FaBus, FaCalendarDay } from 'react-icons/fa'
+import { FaBus, FaCalendarDay ,FaUserTie} from 'react-icons/fa'
 import { MdLocationOn } from 'react-icons/md' 
 import { useMatch, useNavigate } from 'react-router-dom'
-import { FaUserTie } from 'react-icons/fa' // Add this import
 import { TbBusStop } from "react-icons/tb";
 
 interface SidebarItemProps {

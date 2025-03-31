@@ -74,7 +74,6 @@ const Buses = () => {
       }))
     : []
     
-  // Bus status options
   const statusOptions = [
     { value: 'AVAILABLE', label: 'Available' },
     { value: 'NOT_AVAILABLE', label: 'Not Available' },
@@ -89,7 +88,7 @@ const Buses = () => {
       plateNo: record.plateNo,
       zoneId: record.zoneId,
       busStopId: record.busStopId,
-      status: record.status, // Add status to form when editing
+      status: record.status, 
     })
   }
 
@@ -132,7 +131,6 @@ const Buses = () => {
           });
         });
     } else {
-      // For new buses, set the status to AVAILABLE by default
       const busData = {
         ...values,
         status: "AVAILABLE",

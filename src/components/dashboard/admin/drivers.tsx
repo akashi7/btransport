@@ -78,13 +78,11 @@ const Drivers = () => {
 
   const onFinish = (values) => {
     if (editingDriver) {
-      // Update driver case - Keep the status in the request
       const updateData = {...values};
       if (!updateData.password) {
         delete updateData.password;
       }
       
-      // Don't delete the status for updates - driver status can be updated
       
       updateDriver({id: editingDriver.id, data: updateData})
         .unwrap()
@@ -104,14 +102,12 @@ const Drivers = () => {
           });
         });
     } else {
-      // Create new driver case - Remove status
       const driverData = {
         ...values,
         role: "DRIVER",
         isActive: true,
       };
       
-      // Remove status from the API request when creating a new driver
       delete driverData.status;
       
       registerDriver(driverData)

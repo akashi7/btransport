@@ -269,7 +269,7 @@ const boxEndpoints = baseAPI.injectEndpoints({
     deleteZone: builder.mutation<unknown, number>({
       invalidatesTags: ['Zones'],
       query: (id) => ({
-        url: `/zone/${id}/delete-zone`, // Corrected URL format
+        url: `/zone/${id}/delete-zone`, 
         method: 'DELETE',
       }),
     }),
@@ -306,7 +306,6 @@ const boxEndpoints = baseAPI.injectEndpoints({
         method: 'DELETE',
       }),
     }),
-    // Add these mutations in the endpoints builder
 registerBusStop: builder.mutation<unknown, BusStopFormValues>({
   invalidatesTags: ['BusStop'],
   query: (DTO) => ({
@@ -342,17 +341,16 @@ export const {
   useGetBusStopsQuery,
   useGetZonesQuery,
   useRegisterBusMutation,
-  useGetAllManagersQuery,  // Add this
-  useRegisterZoneMutation, // Add this
+  useGetAllManagersQuery,  
+  useRegisterZoneMutation, 
   useDeleteZoneMutation, 
   useUpdateZoneMutation, 
-  useRegisterDriverMutation, // Add these
-  useUpdateDriverMutation,   // Add these  
+  useRegisterDriverMutation, 
+  useUpdateDriverMutation,    
   useDeleteDriverMutation,
-  useRegisterBusStopMutation,  // Add these
-  useUpdateBusStopMutation,    // Add these
+  useRegisterBusStopMutation,  
+  useUpdateBusStopMutation,   
   useDeleteBusStopMutation, 
-  useDeleteBusMutation,    // Add these new exports
-  useUpdateBusMutation, // Add this export
-  // Add this
+  useDeleteBusMutation,    
+  useUpdateBusMutation, 
 } = boxEndpoints

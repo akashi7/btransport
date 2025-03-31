@@ -25,7 +25,7 @@ export const AdminDashboardRoutes: FC = (): ReactElement => {
               <Route path='/buses' element={<Buses />} />
               <Route path='/zones' element={<Zones />} />
               <Route path='/drivers' element={<Drivers />} />
-              <Route path='/busstops' element={<BusStops />} /> {/* Add this route */}
+              <Route path='/busstops' element={<BusStops />} /> 
               <Route path='*' element={<NotFound />} />
             </Routes>
           </ContentWrapper>

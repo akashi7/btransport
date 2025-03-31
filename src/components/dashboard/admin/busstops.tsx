@@ -105,7 +105,6 @@ const BusStops = () => {
           });
         });
     } else {
-      // Create new bus stop
       registerBusStop(values)
         .unwrap()
         .then(() => {

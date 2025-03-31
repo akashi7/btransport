@@ -107,7 +107,6 @@ const Zones = () => {
           });
         });
     } else {
-      // Create new zone
       registerZone(values)
         .unwrap()
         .then(() => {
