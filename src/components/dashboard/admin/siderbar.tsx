@@ -1,7 +1,10 @@
 import { FC, ReactElement, cloneElement } from 'react'
 import { BsCalendar3Week } from 'react-icons/bs'
 import { FaBus, FaCalendarDay } from 'react-icons/fa'
+import { MdLocationOn } from 'react-icons/md' 
 import { useMatch, useNavigate } from 'react-router-dom'
+import { FaUserTie } from 'react-icons/fa' // Add this import
+import { TbBusStop } from "react-icons/tb";
 
 interface SidebarItemProps {
   icon: ReactElement
@@ -71,6 +74,21 @@ const Sidebar: FC = (): ReactElement => {
           icon={<FaBus size={30} />}
           text='Buses'
           url='/admin/buses'
+        />
+           <SidebarItem
+          icon={<MdLocationOn size={30} />}
+          text='Zones'
+          url='/admin/zones'
+        />
+           <SidebarItem
+          icon={<FaUserTie size={30} />}
+          text='Drivers'
+          url='/admin/drivers'
+        />
+           <SidebarItem
+          icon={<TbBusStop size={30} />}
+          text='Bus Stops'
+          url='/admin/busstops'
         />
       </div>
     </section>

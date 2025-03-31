@@ -1,8 +1,9 @@
-import { Table } from 'antd'
+import { Table, Popconfirm, Tag } from 'antd'
 import dayjs from 'dayjs'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
 import { FC, ReactElement, useCallback } from 'react'
+import { EditOutlined, DeleteOutlined } from '@ant-design/icons'
 import { BusesInterface } from '../../lib/api/reports/reportsEndpoints'
 
 dayjs.extend(utc)
@@ -11,6 +12,8 @@ dayjs.extend(timezone)
 interface BusesTableProps {
   data: BusesInterface[] | undefined
   isFetching: boolean
+  onEdit?: (record: BusesInterface) => void
+  onDelete?: (id: number) => void
 }
 
 const { Column } = Table
@@ -18,6 +21,8 @@ const { Column } = Table
 const BusesTable: FC<BusesTableProps> = ({
   data,
   isFetching,
+  onEdit,
+  onDelete,
 }): ReactElement => {
   const formatDate = useCallback((date: string) => {
     return dayjs(date).format('DD/MM/YYYY HH:mm')
@@ -33,6 +38,33 @@ const BusesTable: FC<BusesTableProps> = ({
     }),
     []
   )
+  const getStatusColor = useCallback((status: string) => {
+    switch (status) {
+      case 'AVAILABLE':
+        return 'green';
+      case 'NOT_AVAILABLE':
+        return 'red';
+      case 'IN_USE':
+        return 'blue';
+      case 'MAINTENANCE':
+        return 'orange';
+      default:
+        return 'gray';
+    }
+  }, []);
+
+  const getCarStatusColor = useCallback((status: string) => {
+    switch (status) {
+      case 'GOOD_CONDITION':
+        return 'green';
+      case 'MAINTENANCE':
+        return 'orange';
+      case 'DAMAGED':
+        return 'red';
+      default:
+        return 'gray';
+    }
+  }, []);
 
   return (
     <Table
@@ -77,11 +109,26 @@ const BusesTable: FC<BusesTableProps> = ({
         )}
       />
 
+<Column
+  title='Status'
+  key='status'
+  {...getColumnProps('Status')}
+  render={(record: BusesInterface) => (
+    <Tag color={getStatusColor(record.status)}>
+      {record.status}
+    </Tag>
+  )}
+/>
+
       <Column
-        title='Status'
-        key='status'
-        {...getColumnProps('Status')}
-        render={(record: BusesInterface) => <span>{record.status}</span>}
+        title='Car Condition'
+        key='carCondition'
+        {...getColumnProps('Car Condition')}
+        render={(record: BusesInterface) => (
+          <Tag color={getCarStatusColor(record.CarStatus)}>
+            {record.CarStatus.replace('_', ' ')}
+          </Tag>
+        )}
       />
 
       <Column
@@ -101,6 +148,34 @@ const BusesTable: FC<BusesTableProps> = ({
           <span>{formatDate(record.busStop.updatedAt)}</span>
         )}
       />
+
+      {(onEdit || onDelete) && (
+        <Column
+          title='Actions'
+          key='actions'
+          {...getColumnProps('Actions')}
+          render={(record: BusesInterface) => (
+            <div className='flex gap-3'>
+              {onEdit && (
+                <EditOutlined
+                  className='text-blue-500 cursor-pointer'
+                  onClick={() => onEdit(record)}
+                />
+              )}
+              {onDelete && (
+                <Popconfirm
+                  title='Are you sure you want to delete this bus?'
+                  onConfirm={() => onDelete(record.id)}
+                  okText='Yes'
+                  cancelText='No'
+                >
+                  <DeleteOutlined className='text-red-500 cursor-pointer' />
+                </Popconfirm>
+              )}
+            </div>
+          )}
+        />
+      )}
     </Table>
   )
 }
