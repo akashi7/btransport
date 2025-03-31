@@ -3,9 +3,12 @@ import { Route, Routes } from 'react-router-dom'
 import ContentWrapper from '../components/common/contentwrapper/contentwrapper'
 import NavBar from '../components/common/header/navBar'
 import Buses from '../components/dashboard/admin/buses'
+import BusStops from '../components/dashboard/admin/busstops'
 import DailyReports from '../components/dashboard/admin/dailyreports'
+import Drivers from '../components/dashboard/admin/drivers'
 import Sidebar from '../components/dashboard/admin/siderbar'
 import WeeklyReports from '../components/dashboard/admin/weeklyreports'
+import Zones from '../components/dashboard/admin/zones'
 import NotFound from '../components/notfound/notFound'
 
 export const AdminDashboardRoutes: FC = (): ReactElement => {
@@ -20,6 +23,9 @@ export const AdminDashboardRoutes: FC = (): ReactElement => {
               <Route path='/' element={<WeeklyReports />} />
               <Route path='/daily' element={<DailyReports />} />
               <Route path='/buses' element={<Buses />} />
+              <Route path='/zones' element={<Zones />} />
+              <Route path='/drivers' element={<Drivers />} />
+              <Route path='/busstops' element={<BusStops />} /> 
               <Route path='*' element={<NotFound />} />
             </Routes>
           </ContentWrapper>

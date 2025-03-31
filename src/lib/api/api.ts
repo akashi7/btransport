@@ -18,7 +18,7 @@ const baseQueryWithAuth = async (
   const baseQuery = fetchBaseQuery({
     baseUrl: BASE_URL,
     prepareHeaders: (headers: Headers): Headers => {
-      const localToken = getFromLocal<string>('token')
+      const localToken = getFromLocal<string>('token') || null
 
       if (localToken) {
         headers.set('authorization', `Bearer ${localToken}`)

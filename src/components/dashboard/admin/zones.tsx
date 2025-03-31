@@ -1,156 +1,126 @@
 /* eslint-disable  @typescript-eslint/no-explicit-any */
+
 import { Col, Form, Row } from 'antd'
 import { useEffect, useState } from 'react'
-import Notify from '../../../components/common/notification/notification'
 import requiredField from '../../../helpers/requiredField'
+import Notify from '../../common/notification/notification'
 import {
-  BusFormValues,
-  useGetAllBusesQuery,
-  useGetBusStopsQuery,
   useGetZonesQuery,
-  useRegisterBusMutation,
-  useUpdateBusMutation,
-  useDeleteBusMutation
+  useGetAllManagersQuery,
+  useRegisterZoneMutation,
+  useDeleteZoneMutation,
+  useUpdateZoneMutation
 } from '../../../lib/api/reports/reportsEndpoints'
 import CustomButton from '../../common/button/button'
 import CustomInput from '../../common/input/customInput'
 import CustomModal from '../../common/modal/customModal'
 import Paginator from '../../common/paginator/paginator'
-import BusesTable from '../../tables/buses.table'
+import ZonesTable from '../../tables/zones.table'
 
-const Buses = () => {
+const Zones = () => {
   const [form] = Form.useForm()
   const [currentPage, setCurrentPage] = useState<number>(0)
   const [isModalVisible, setIsModalVisible] = useState(false)
-  const [editingBus, setEditingBus] = useState<any>(null)
+  const [editingZone, setEditingZone] = useState<any>(null)
   const size = 10
   
-  const { data, isFetching, refetch } = useGetAllBusesQuery({
+  const { data, isFetching, refetch } = useGetZonesQuery({
     page: currentPage.toString(),
     size: size.toString(),
   })
 
-  const [registerBus, { isLoading }] = useRegisterBusMutation()
-  const [updateBus, { isLoading: isUpdating }] = useUpdateBusMutation()
-  const [deleteBus] = useDeleteBusMutation()
+  const { 
+    data: managers, 
+    refetch: refetchManagers,
+    isFetching: isLoadingManagers 
+  } = useGetAllManagersQuery()
+
+  const [registerZone, { isLoading }] = useRegisterZoneMutation()
+  const [updateZone, { isLoading: isUpdating }] = useUpdateZoneMutation()
+  const [deleteZone] = useDeleteZoneMutation()
 
   const handleCancel = () => {
     setIsModalVisible(false)
-    setEditingBus(null)
+    setEditingZone(null)
     form.resetFields()
   }
 
-  const {
-    data: zones,
-    refetch: refetchZones,
-    isFetching: zF,
-  } = useGetZonesQuery({})
-  
-  const {
-    data: busStops,
-    refetch: refetchBusStops,
-    isFetching: BL,
-  } = useGetBusStopsQuery({})
-
   useEffect(() => {
     refetch()
-    refetchZones()
-    refetchBusStops()
-  }, [refetch, refetchZones, refetchBusStops])
+    refetchManagers()
+  }, [refetch, refetchManagers])
 
-  const busesStops = busStops
-    ? busStops?.data?.items?.map((item) => ({
-        key: item.id,
-        value: item.id,
-        label: item.busStopName,
+  const managersOptions = managers
+    ? managers.data?.items?.map((manager) => ({
+        key: manager.id,
+        value: manager.id,
+        label: manager.user?.fullName || 'Unknown',
       }))
     : []
-
-  const zonesOptions = zones
-    ? zones?.data?.items?.map((item) => ({
-        key: item.id,
-        value: item.id,
-        label: item.zoneName,
-      }))
-    : []
-    
-  const statusOptions = [
-    { value: 'AVAILABLE', label: 'Available' },
-    { value: 'NOT_AVAILABLE', label: 'Not Available' },
-    { value: 'IN_USE', label: 'In Use' },
-    { value: 'MAINTENANCE', label: 'Maintenance' },
-  ]
 
   const handleEdit = (record) => {
-    setEditingBus(record)
+    setEditingZone(record)
     setIsModalVisible(true)
     form.setFieldsValue({
-      plateNo: record.plateNo,
-      zoneId: record.zoneId,
-      busStopId: record.busStopId,
-      status: record.status, 
+      zoneName: record.zoneName,
+      destination: record.destination,
+      managerId: record.managerId,
     })
   }
 
   const handleDelete = (id) => {
-    deleteBus(id) 
+    deleteZone(id) 
       .unwrap()
       .then(() => {
         refetch();
         Notify({
           message: 'Success',
-          description: 'Bus deleted successfully',
+          description: 'Zone deleted successfully',
         });
       })
       .catch(() => {
         Notify({
           message: 'Error',
-          description: 'Failed to delete bus',
+          description: 'Failed to delete zone',
           type: 'error',
         });
       });
   }
 
-  const onFinish = (values: BusFormValues) => {
-    if (editingBus) {
-      updateBus({id: editingBus.id, data: values})
+  const onFinish = (values) => {
+    if (editingZone) {
+      updateZone({id: editingZone.id, data: values})
         .unwrap()
         .then(() => {
           handleCancel();
           refetch();
           Notify({
             message: 'Success',
-            description: 'Bus updated successfully',
+            description: 'Zone updated successfully',
           });
         })
         .catch((err) => {
           Notify({
             message: 'Error',
-            description: err?.data?.message || 'Failed to update bus',
+            description: err?.data?.message || 'Failed to update zone',
             type: 'error',
           });
         });
     } else {
-      const busData = {
-        ...values,
-        status: "AVAILABLE",
-        CarStatus: "GOOD_CONDITION"
-      };
-      
-      registerBus(busData)
+      registerZone(values)
         .unwrap()
         .then(() => {
           handleCancel();
           refetch();
           Notify({
             message: 'Success',
-            description: 'Bus created successfully',
+            description: 'Zone created successfully',
           });
         })
         .catch((err) => {
           Notify({
             message: 'Error',
-            description: err?.data?.message || 'Failed to create bus',
+            description: err?.data?.message || 'Failed to create zone',
             type: 'error',
           });
         });
@@ -162,88 +132,74 @@ const Buses = () => {
       <CustomModal
         isVisible={isModalVisible}
         setIsVisible={setIsModalVisible}
-        title={editingBus ? 'Edit Bus' : 'Add Bus'}
+        title={editingZone ? 'Edit Zone' : 'Add Zone'}
         handleCancel={handleCancel}
         width={1000}
         footerContent={
           <CustomButton
             type='primary'
             htmlType='submit'
-            form='add-bus-form'
+            form='add-zone-form'
             className='h-[50px] w-fit'
             loading={isLoading || isUpdating}
           >
-            {isLoading || isUpdating ? 'Submitting...' : editingBus ? 'Update' : 'Submit'}
+            {isLoading || isUpdating ? 'Submitting...' : editingZone ? 'Update' : 'Submit'}
           </CustomButton>
         }
       >
         <Form
           className='space-y-6'
-          name='add-bus-form'
+          name='add-zone-form'
           form={form}
           onFinish={onFinish}
         >
           <Row gutter={16}>
             <Col span={24}>
               <CustomInput
-                placeholder='Plate No'
-                label='Plate No'
+                placeholder='Zone Name'
+                label='Zone Name'
                 inputType='text'
-                name='plateNo'
-                rules={requiredField('Plate')}
+                name='zoneName'
+                rules={requiredField('Zone name')}
               />
             </Col>
             <Col span={24}>
               <CustomInput
-                label='Zone'
-                name='zoneId'
-                type='select'
-                placeholder='Please select'
-                rules={requiredField('Zone')}
-                options={zonesOptions}
-                isLoading={zF}
+                placeholder='Destination'
+                label='Destination'
+                inputType='text'
+                name='destination'
+                rules={requiredField('Destination')}
               />
             </Col>
             <Col span={24}>
               <CustomInput
-                label='Bus stop'
-                name='busStopId'
+                label='Manager'
+                name='managerId'
                 type='select'
-                placeholder='Please select'
-                rules={requiredField('Bus stop')}
-                options={busesStops}
-                isLoading={BL}
+                placeholder='Please select a manager'
+                rules={requiredField('Manager')}
+                options={managersOptions}
+                isLoading={isLoadingManagers}
               />
             </Col>
-            {editingBus && (
-              <Col span={24}>
-                <CustomInput
-                  label='Status'
-                  name='status'
-                  type='select'
-                  placeholder='Please select status'
-                  rules={requiredField('Status')}
-                  options={statusOptions}
-                />
-              </Col>
-            )}
           </Row>
         </Form>
       </CustomModal>
       <div>
         <div className='flex justify-between items-center'>
-          <h1>Buses</h1>
+          <h1>Zones</h1>
           <CustomButton
             type='primary'
             className='w-fit h-[50px]'
             htmlType='button'
             onClick={() => setIsModalVisible(!isModalVisible)}
           >
-            Add Bus
+            Add Zone
           </CustomButton>
         </div>
         <div className='mt-10'>
-          <BusesTable 
+          <ZonesTable 
             isFetching={isFetching} 
             data={data?.data?.items}
             onEdit={handleEdit}
@@ -262,4 +218,4 @@ const Buses = () => {
   )
 }
 
-export default Buses
+export default Zones

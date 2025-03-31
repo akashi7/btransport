@@ -1,251 +1,221 @@
 /* eslint-disable  @typescript-eslint/no-explicit-any */
 import { Col, Form, Row } from 'antd'
 import { useEffect, useState } from 'react'
-import Notify from '../../../components/common/notification/notification'
 import requiredField from '../../../helpers/requiredField'
+import Notify from '../../../components/common/notification/notification'
 import {
-  BusFormValues,
-  useGetAllBusesQuery,
-  useGetBusStopsQuery,
-  useGetZonesQuery,
-  useRegisterBusMutation,
-  useUpdateBusMutation,
-  useDeleteBusMutation
+  useGetAllDriversQuery,
+  useRegisterDriverMutation,
+  useUpdateDriverMutation,
+  useDeleteDriverMutation,
 } from '../../../lib/api/reports/reportsEndpoints'
 import CustomButton from '../../common/button/button'
 import CustomInput from '../../common/input/customInput'
 import CustomModal from '../../common/modal/customModal'
 import Paginator from '../../common/paginator/paginator'
-import BusesTable from '../../tables/buses.table'
+import DriversTable from '../../tables/drivers.table'
 
-const Buses = () => {
+const Drivers = () => {
   const [form] = Form.useForm()
   const [currentPage, setCurrentPage] = useState<number>(0)
   const [isModalVisible, setIsModalVisible] = useState(false)
-  const [editingBus, setEditingBus] = useState<any>(null)
+  const [editingDriver, setEditingDriver] = useState<any>(null)
+  const [isPasswordVisible, setIsPasswordVisible] = useState(true)
   const size = 10
   
-  const { data, isFetching, refetch } = useGetAllBusesQuery({
-    page: currentPage.toString(),
-    size: size.toString(),
-  })
+  const { data, isFetching, refetch } = useGetAllDriversQuery()
 
-  const [registerBus, { isLoading }] = useRegisterBusMutation()
-  const [updateBus, { isLoading: isUpdating }] = useUpdateBusMutation()
-  const [deleteBus] = useDeleteBusMutation()
+  const [registerDriver, { isLoading }] = useRegisterDriverMutation()
+  const [updateDriver, { isLoading: isUpdating }] = useUpdateDriverMutation()
+  const [deleteDriver] = useDeleteDriverMutation()
 
   const handleCancel = () => {
     setIsModalVisible(false)
-    setEditingBus(null)
+    setEditingDriver(null)
+    setIsPasswordVisible(true)
     form.resetFields()
   }
 
-  const {
-    data: zones,
-    refetch: refetchZones,
-    isFetching: zF,
-  } = useGetZonesQuery({})
-  
-  const {
-    data: busStops,
-    refetch: refetchBusStops,
-    isFetching: BL,
-  } = useGetBusStopsQuery({})
-
   useEffect(() => {
     refetch()
-    refetchZones()
-    refetchBusStops()
-  }, [refetch, refetchZones, refetchBusStops])
+  }, [refetch])
 
-  const busesStops = busStops
-    ? busStops?.data?.items?.map((item) => ({
-        key: item.id,
-        value: item.id,
-        label: item.busStopName,
-      }))
-    : []
-
-  const zonesOptions = zones
-    ? zones?.data?.items?.map((item) => ({
-        key: item.id,
-        value: item.id,
-        label: item.zoneName,
-      }))
-    : []
-    
   const statusOptions = [
     { value: 'AVAILABLE', label: 'Available' },
     { value: 'NOT_AVAILABLE', label: 'Not Available' },
-    { value: 'IN_USE', label: 'In Use' },
-    { value: 'MAINTENANCE', label: 'Maintenance' },
+    { value: 'ON_DUTY', label: 'On Duty' },
   ]
 
   const handleEdit = (record) => {
-    setEditingBus(record)
+    setEditingDriver(record)
+    setIsPasswordVisible(false)
     setIsModalVisible(true)
     form.setFieldsValue({
-      plateNo: record.plateNo,
-      zoneId: record.zoneId,
-      busStopId: record.busStopId,
-      status: record.status, 
+      fullName: record.user.fullName,
+      email: record.user.email,
+      status: record.status,
     })
   }
 
   const handleDelete = (id) => {
-    deleteBus(id) 
+    deleteDriver(id) 
       .unwrap()
       .then(() => {
         refetch();
         Notify({
           message: 'Success',
-          description: 'Bus deleted successfully',
+          description: 'Driver deleted successfully',
         });
       })
       .catch(() => {
         Notify({
           message: 'Error',
-          description: 'Failed to delete bus',
+          description: 'Failed to delete driver',
           type: 'error',
         });
       });
   }
 
-  const onFinish = (values: BusFormValues) => {
-    if (editingBus) {
-      updateBus({id: editingBus.id, data: values})
+  const onFinish = (values) => {
+    if (editingDriver) {
+      const updateData = {...values};
+      if (!updateData.password) {
+        delete updateData.password;
+      }
+      
+      
+      updateDriver({id: editingDriver.id, data: updateData})
         .unwrap()
         .then(() => {
           handleCancel();
           refetch();
           Notify({
             message: 'Success',
-            description: 'Bus updated successfully',
+            description: 'Driver updated successfully',
           });
         })
         .catch((err) => {
           Notify({
             message: 'Error',
-            description: err?.data?.message || 'Failed to update bus',
+            description: err?.data?.message || 'Failed to update driver',
             type: 'error',
           });
         });
     } else {
-      const busData = {
+      const driverData = {
         ...values,
-        status: "AVAILABLE",
-        CarStatus: "GOOD_CONDITION"
+        role: "DRIVER",
+        isActive: true,
       };
       
-      registerBus(busData)
+      delete driverData.status;
+      
+      registerDriver(driverData)
         .unwrap()
         .then(() => {
           handleCancel();
           refetch();
           Notify({
             message: 'Success',
-            description: 'Bus created successfully',
+            description: 'Driver created successfully',
           });
         })
         .catch((err) => {
           Notify({
             message: 'Error',
-            description: err?.data?.message || 'Failed to create bus',
+            description: err?.data?.message || 'Failed to create driver',
             type: 'error',
           });
         });
     }
   }
+  const paginatedDrivers = data?.data?.items || [];
 
   return (
     <>
       <CustomModal
         isVisible={isModalVisible}
         setIsVisible={setIsModalVisible}
-        title={editingBus ? 'Edit Bus' : 'Add Bus'}
+        title={editingDriver ? 'Edit Driver' : 'Add Driver'}
         handleCancel={handleCancel}
         width={1000}
         footerContent={
           <CustomButton
             type='primary'
             htmlType='submit'
-            form='add-bus-form'
+            form='add-driver-form'
             className='h-[50px] w-fit'
             loading={isLoading || isUpdating}
           >
-            {isLoading || isUpdating ? 'Submitting...' : editingBus ? 'Update' : 'Submit'}
+            {isLoading || isUpdating ? 'Submitting...' : editingDriver ? 'Update' : 'Submit'}
           </CustomButton>
         }
       >
         <Form
           className='space-y-6'
-          name='add-bus-form'
+          name='add-driver-form'
           form={form}
           onFinish={onFinish}
         >
           <Row gutter={16}>
             <Col span={24}>
               <CustomInput
-                placeholder='Plate No'
-                label='Plate No'
+                placeholder='Full Name'
+                label='Full Name'
                 inputType='text'
-                name='plateNo'
-                rules={requiredField('Plate')}
+                name='fullName'
+                rules={requiredField('Full name')}
               />
             </Col>
             <Col span={24}>
               <CustomInput
-                label='Zone'
-                name='zoneId'
-                type='select'
-                placeholder='Please select'
-                rules={requiredField('Zone')}
-                options={zonesOptions}
-                isLoading={zF}
+                placeholder='Email'
+                label='Email'
+                inputType='email'
+                name='email'
+                rules={requiredField('Email')}
               />
             </Col>
-            <Col span={24}>
-              <CustomInput
-                label='Bus stop'
-                name='busStopId'
-                type='select'
-                placeholder='Please select'
-                rules={requiredField('Bus stop')}
-                options={busesStops}
-                isLoading={BL}
-              />
-            </Col>
-            {editingBus && (
+            {isPasswordVisible && (
               <Col span={24}>
                 <CustomInput
-                  label='Status'
-                  name='status'
-                  type='select'
-                  placeholder='Please select status'
-                  rules={requiredField('Status')}
-                  options={statusOptions}
+                  placeholder='Password'
+                  label='Password'
+                  inputType='password'
+                  name='password'
+                  rules={!editingDriver ? requiredField('Password') : []}
                 />
               </Col>
             )}
+            <Col span={24}>
+              <CustomInput
+                label='Status'
+                name='status'
+                type='select'
+                placeholder='Please select status'
+                rules={requiredField('Status')}
+                options={statusOptions}
+              />
+            </Col>
           </Row>
         </Form>
       </CustomModal>
       <div>
         <div className='flex justify-between items-center'>
-          <h1>Buses</h1>
+          <h1>Drivers</h1>
           <CustomButton
             type='primary'
             className='w-fit h-[50px]'
             htmlType='button'
             onClick={() => setIsModalVisible(!isModalVisible)}
           >
-            Add Bus
+            Add Driver
           </CustomButton>
         </div>
         <div className='mt-10'>
-          <BusesTable 
+          <DriversTable 
             isFetching={isFetching} 
-            data={data?.data?.items}
+            data={paginatedDrivers}
             onEdit={handleEdit}
             onDelete={handleDelete} 
           />
@@ -262,4 +232,4 @@ const Buses = () => {
   )
 }
 
-export default Buses
+export default Drivers
